@@ -11,7 +11,10 @@ monitor, an Express/Zod API, a Prisma/PostgreSQL ledger, Redis/Lua admission,
 RabbitMQ outbox publishing and an idempotent worker. It was built and verified on
 Windows with Node 22, PostgreSQL 16, Redis 7 and RabbitMQ 3.13.
 
+Flash-Sale UI
 ![A dark storefront with the Aether X1 Pro, live stock and a checkout modal](docs/storefront.png)
+RabbitMQ
+![RabbitMQ](docs/rabbit_mq.png)
 
 ## What is guaranteed
 
