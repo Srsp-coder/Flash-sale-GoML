@@ -1,0 +1,26 @@
+{
+  "name": "flashsale",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FlashSale - reliable high-concurrency checkout on PostgreSQL, Redis and RabbitMQ",
+  "scripts": {
+    "install:all": "npm --prefix backend install && npm --prefix frontend install",
+    "build": "npm --prefix backend run build && npm --prefix frontend run build",
+    "dev:api": "npm --prefix backend run dev",
+    "dev:worker": "npm --prefix backend run dev:worker",
+    "dev:outbox": "npm --prefix backend run dev:outbox",
+    "dev:web": "npm --prefix frontend run dev",
+    "test": "npm --prefix backend run test && npm --prefix frontend run test",
+    "test:backend": "npm --prefix backend run test",
+    "test:frontend": "npm --prefix frontend run test",
+    "test:concurrency": "npm --prefix backend run test:concurrency",
+    "typecheck": "npm --prefix backend run typecheck && npm --prefix frontend run typecheck",
+    "db:migrate": "npm --prefix backend run prisma:migrate",
+    "db:seed": "npm --prefix backend run seed",
+    "db:reset": "npm --prefix backend run reset:inventory",
+    "db:reset:force": "npm --prefix backend run reset:inventory:force",
+    "docker:up": "docker compose up --build -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f api worker outbox web"
+  }
+}

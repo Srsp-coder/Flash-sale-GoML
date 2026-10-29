@@ -1,0 +1,121 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ReservationStatus {
+  ACTIVE
+  CONFIRMED
+  EXPIRED
+  RELEASED
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
+enum OutboxStatus {
+  PENDING
+  PUBLISHING
+  PUBLISHED
+  FAILED
+}
+
+model Product {
+  id               String   @id
+  sku              String   @unique
+  name             String
+  tagline          String
+  description      String
+  priceInr         Int
+  originalPriceInr Int
+  currency         String   @default("INR")
+  imageUrl         String
+  specs            Json
+  initialStock     Int      @default(500)
+  /// Number of units held by ACTIVE reservations. Confirmed/expired reservations leave this counter.
+  reservedStock    Int      @default(0)
+  /// Number of units attached to CONFIRMED orders.
+  soldStock        Int      @default(0)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  reservations Reservation[]
+  orders       Order[]
+
+  @@map("products")
+}
+
+model Reservation {
+  id             String            @id
+  productId      String
+  product        Product           @relation(fields: [productId], references: [id], onDelete: Restrict)
+  quantity       Int               @default(1)
+  idempotencyKey String            @unique
+  payloadHash    String
+  status         ReservationStatus @default(ACTIVE)
+  expiresAt      DateTime
+  releasedAt     DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  order Order?
+
+  @@index([productId, status])
+  @@index([status, expiresAt])
+  @@map("reservations")
+}
+
+model Order {
+  id                  String    @id
+  productId           String
+  product             Product   @relation(fields: [productId], references: [id], onDelete: Restrict)
+  reservationId       String    @unique
+  reservation         Reservation @relation(fields: [reservationId], references: [id], onDelete: Restrict)
+  idempotencyKey      String    @unique
+  payloadHash         String
+  status              OrderStatus @default(PENDING)
+  quantity            Int       @default(1)
+  unitPriceInr        Int
+  totalPriceInr       Int
+  customerName        String
+  customerEmail       String
+  shippingAddress     String
+  failureReason       String?
+  processingStartedAt DateTime?
+  confirmedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  outboxEvents OutboxEvent[]
+
+  @@index([status, createdAt])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OutboxEvent {
+  id            String       @id @default(uuid())
+  orderId       String
+  order         Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  eventType     String
+  payload       Json
+  status        OutboxStatus @default(PENDING)
+  attempts      Int          @default(0)
+  nextAttemptAt DateTime     @default(now())
+  lockedAt      DateTime?
+  publishedAt   DateTime?
+  lastError     String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@unique([orderId, eventType])
+  @@index([status, nextAttemptAt])
+  @@map("outbox_events")
+}

@@ -1,0 +1,14 @@
+{
+    "initial":  500,
+    "available":  499,
+    "reserved":  0,
+    "confirmed":  1,
+    "invariant":  true,
+    "outboxPublished":  1,
+    "queue":  {
+                  "name":  "flashsale.orders.queue",
+                  "ready":  0,
+                  "unacknowledged":  0,
+                  "consumers":  1
+              }
+}

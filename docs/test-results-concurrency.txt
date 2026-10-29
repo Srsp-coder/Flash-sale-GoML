@@ -1,0 +1,62 @@
+
+> flashsale-backend@1.0.0 test:concurrency
+> tsx tests/concurrency/flash-sale-concurrency.ts
+
+==> preparing isolated test database and 500-unit sale
+==> API listening on http://127.0.0.1:62272
+==> firing 1000 concurrent checkouts with unique keys
+==> checking concurrent idempotent replays
+==> publishing the transactional outbox through RabbitMQ
+==> starting the real RabbitMQ worker
+
+=== RESULT: PASS ===
+{
+  "requests": 1000,
+  "units": 500,
+  "accepted": 500,
+  "soldOut": 500,
+  "otherStatuses": 0,
+  "checkoutWallMs": 6809.6,
+  "throughputPerSecond": 146.9,
+  "latencyMs": {
+    "p50": 5633.7,
+    "p95": 6613.7,
+    "p99": 6619.2,
+    "max": 6790.5
+  },
+  "idempotentReplays": {
+    "requests": 50,
+    "wallMs": 241.1
+  },
+  "ledger": {
+    "initialStock": 500,
+    "availableStock": 0,
+    "activeReservations": 0,
+    "confirmedOrders": 500,
+    "invariantHolds": true
+  },
+  "orders": {
+    "CONFIRMED": 500
+  },
+  "reservations": {
+    "active": 0,
+    "confirmed": 500
+  },
+  "outbox": {
+    "PUBLISHED": 500
+  },
+  "queues": {
+    "queue": {
+      "ready": 0,
+      "unacked": 0,
+      "consumers": 0
+    },
+    "retry": {
+      "ready": 0,
+      "unacked": 0
+    },
+    "deadLetter": {
+      "ready": 0
+    }
+  }
+}
